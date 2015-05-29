@@ -19,43 +19,42 @@ def createarr(N): #creates random array of 1 and -1
                 arr[x,y]= 1
     return arr
     
-def copy(arr,N): #copys the arr to a new array
-    arrnew = zeros((N,N))
-    for y in range(0, N):
-        for x in range(0, N):
-            arrnew[x,y]=arr[x,y]
-    return arrnew
 def calcE(arr,N):#calculates energy
     E = 0
     m = 0
     for y in range(0, N):
         for x in range(0, N):
+            '''
+            	if(x<N-1):
+			E=E -arr[x,y]*arr[x+1,y]
+		elif(x==N-1): 
+			E=E -arr[x,y]*arr[1,y]
+		if(y<N-1):
+			E=E -arr[x,y]*arr[x,y+1]
+		elif(y==N-1):
+			E=E -arr[x,y]*arr[x,1]
+	'''
             m +=arr[x,y]
             E += -arr[x,y]*arr[bc(x+1,N),y]-arr[x,y]*arr[bc(x-1,N),y]-arr[x,y]*arr[x,bc(y+1,N)]-arr[x,y]*arr[x,bc(y-1,N)]
+            
     return E/2, m
     
 def relcalcE(arr,x,y,N):#calculates relative energy
     E = -arr[x,y]*arr[bc(x+1,N),y]-arr[x,y]*arr[bc(x-1,N),y]-arr[x,y]*arr[x,bc(y+1,N)]-arr[x,y]*arr[x,bc(y-1,N)]
     return E
     
-def flip(arr,N,T,kb):
+def flip(arr,N,T):
         for y in range(0, N):
             for x in range(0, N):
                 E0 = relcalcE(arr,x,y,N)
-                arrnew = copy(arr,N)
-                if(arrnew[x,y] ==1.):
-                    arrnew[x,y] = -1.
-                    Enew = relcalcE(arrnew,x,y,N)
-                else:
-                    arrnew[x,y] = 1.
-                    Enew = relcalcE(arrnew,x,y,N)
+                Enew = -1*E0
                 if(Enew<= E0):
-                    arr = copy(arrnew,N)
+                    arr[x,y] *= -1
                 else:
-                    p = exp(-(Enew-E0)/(kb*T))
-                    x = random()
-                    if(p>=x):
-                        arr = copy(arrnew,N)
+                    p = exp(-(Enew-E0)/(T))
+                    ran = random()
+                    if(p>=ran):
+                        arr[x,y] *= -1
 
         E0, m = calcE(arr,N) 
         return E0,arr,m
@@ -76,7 +75,7 @@ i = 0
 for y in range(1,51,1):
     T = y/10.
     for x in range(0, I):       
-        E0, arr,M = flip(arr,N,T,kb)
+        E0, arr,M = flip(arr,N,T)
         Eavg[i] +=E0
         Mavg[i] +=M
 
@@ -88,10 +87,16 @@ temp = arange(0.1,5.1,.1)
 
 figure(1)
 title('temp VS Eavg')
-plot(temp,Eavg,'.')
+plot(temp,Eavg,'.',label='N = 50')
+xlabel('Temperature')
+ylabel('Eavg')
+legend(loc = 'best')
 figure(2)
 title('temp VS Mavg')
-plot(temp,Mavg,'.')
+plot(temp,Mavg,'.',label='N = 50')
+xlabel('Temperature')
+ylabel('Mavg')
+legend(loc = 'best')
 
 
 show()
@@ -100,6 +105,7 @@ timeend = time.clock()
 
 
 runtime = timeend-timestart
-print runtime
+print 'runtime: ', runtime
+
 
 
